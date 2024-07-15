@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.geo.mapper.MemberMapper">
+
+
+	<resultMap type="org.geo.domain.MemberVO" id="memberMap">
+		<id property="userid" column="userid" />
+		<result property="userid" column="userid" />
+		<result property="userpw" column="userpw" />
+		<result property="username" column="username" />
+		<result property="regDate" column="regdate" />
+		<result property="email" column="email" />
+		<collection property="authList" resultMap="authMap">
+		</collection>
+	</resultMap>
+
+	<resultMap type="org.geo.domain.AuthVO" id="authMap">
+		<result property="userid" column="userid" />
+		<result property="auth" column="auth" />
+	</resultMap>
+
+	<select id="readMember" resultMap="memberMap">
+		SELECT
+		mem.userid, userpw, enabled, regdate, username, email, auth
+		FROM
+		tbl_member mem LEFT OUTER JOIN tbl_member_auth auth on mem.userid = auth.userid
+		WHERE mem.userid = #{userid}
+	</select>
+	
+	<insert id="insertMember">
+		INSERT INTO tbl_member(userid, userpw, username, email)
+		VALUES (#{userid}, #{userpw}, #{username}, #{email})
+	</insert>
+	
+	<insert id="insertAuth">
+		INSERT INTO tbl_member_auth (userid, auth)
+		VALUES (#{userid}, #{auth})
+	</insert>
+	
+	<select id="selectUserid" resultType="boolean">
+		SELECT COUNT(*)
+		  FROM tbl_member
+		 WHERE userid = #{userid}
+	</select>
+	
+	<select id="findByUserId" resultType="org.geo.domain.MemberVO">
+		SELECT *
+		  FROM tbl_member
+		 WHERE userid = #{userid}
+	</select>
+	
+
+	<delete id="deleteMember">
+		delete from tbl_member where userid = #{userid}
+	</delete>
+	
+	<delete id="deleteAuth">
+		delete from tbl_member_auth where userid = #{userid}
+	</delete>
+	
+
+</mapper>

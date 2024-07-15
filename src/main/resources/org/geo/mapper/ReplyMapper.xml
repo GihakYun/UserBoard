@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.geo.mapper.ReplyMapper">
+	<insert id="insert">
+		insert into tbl_reply (rid, bid, reply, replyer)
+		values (rid_seq.nextval, #{bid}, #{reply}, #{replyer})
+	</insert>
+	
+	<select id="read" resultType="org.geo.domain.ReplyVO">
+		select * from tbl_reply where rid = #{rid}
+	</select>
+	
+	<delete id="delete">
+		delete from tbl_reply where rid = #{rid}
+	</delete>
+	
+	<update id="update">
+		update tbl_reply set reply = #{reply}, replyUpdate = 1
+		where rid = #{rid}
+	</update>
+	
+	<select id="getListWithPaging" resultType="org.geo.domain.ReplyVO">
+	  <![CDATA[
+	 select  rid, bid, reply, replyer, replydate, replyUpdate
+	 from 
+	   (
+	    select /*+INDEX_DESC(tbl_reply idx_reply) */ 
+	      rownum rn,  rid, bid, reply, replyer, replyDate, replyUpdate
+	    from tbl_reply
+	    where bid =  #{bid}
+	    and rid > 0
+	    and rownum <= #{cri.pageNum} * #{cri.amount}
+	   ) where rn > (#{cri.pageNum} -1) * #{cri.amount}
+	]]>
+	</select>
+	
+	<select id="getCountByBid" resultType="int">
+		<![CDATA[
+			select count(rid)
+			from tbl_reply
+			where bid = #{bid}
+		]]>
+	</select>
+	
+	<delete id="deleteReplyByUserid">
+		delete from tbl_reply where replyer = #{userid}
+	</delete>
+</mapper>
